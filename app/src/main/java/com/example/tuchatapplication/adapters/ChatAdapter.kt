@@ -15,8 +15,7 @@ open class ChatAdapter(context: Context): RecyclerView.Adapter<RecyclerView.View
     private var lst: ArrayList<Chat> = ArrayList()
     var sharedPreferences = context.getSharedPreferences(context.getString(R.string.User), MODE_PRIVATE)
     var userId = sharedPreferences!!.getString(context.getString(R.string.id), "")
-
-    private var SEND_TYPE = userId!!.toInt()
+    private val SEND_TYPE = userId!!.toInt()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         if (viewType == SEND_TYPE){
@@ -29,7 +28,7 @@ open class ChatAdapter(context: Context): RecyclerView.Adapter<RecyclerView.View
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         var chat: Chat = lst[position]
-        if (chat.chatId!!.toInt() == SEND_TYPE){
+        if (chat.userId!!.toInt() == SEND_TYPE){
             var sendViewModel: SendViewModel = holder as SendViewModel
             sendViewModel.name.text = chat.userId.toString()
             sendViewModel.content.text = chat.message
@@ -49,6 +48,7 @@ open class ChatAdapter(context: Context): RecyclerView.Adapter<RecyclerView.View
 
     override fun getItemViewType(position: Int): Int {
         return lst[position].userId!!.toInt()
+
     }
 
     protected class SendViewModel(view: View): RecyclerView.ViewHolder(view){
@@ -71,4 +71,10 @@ open class ChatAdapter(context: Context): RecyclerView.Adapter<RecyclerView.View
             notifyDataSetChanged()
         }
     }
+
+    fun addNewData(chat: Chat, pos: Int){
+        lst.add(chat)
+        notifyItemInserted(pos)
+    }
+
 }

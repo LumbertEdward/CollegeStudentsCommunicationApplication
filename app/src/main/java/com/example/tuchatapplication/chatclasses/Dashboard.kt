@@ -49,6 +49,7 @@ class Dashboard : Fragment(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
     }
 
     override fun onCreateView(
@@ -91,7 +92,11 @@ class Dashboard : Fragment(), View.OnClickListener {
     private fun getListData() {
         chattingViewModel.getMemberGroups(userId!!).observe(viewLifecycleOwner, Observer {
             if (it.isNotEmpty()){
-            showRecycler(it)
+
+                showRecycler(it)
+            }
+            else{
+                Toast.makeText(activity, "Not Found", Toast.LENGTH_LONG).show()
             }
         })
     }
@@ -102,10 +107,9 @@ class Dashboard : Fragment(), View.OnClickListener {
         }
 
         if (groups.size > 0){
+            groupsAdapter.getData(groups)
             recyclerView.adapter = groupsAdapter
             recyclerView.layoutManager = linearLayoutManager
-            groupsAdapter.getData(groups)
-            recyclerView.scrollToPosition(groups.size - 1)
         }
     }
 
@@ -158,11 +162,9 @@ class Dashboard : Fragment(), View.OnClickListener {
                 if (resp >= 0){
                     bottomSheetDialog.hide()
                     generalinterface.addChatRoom(group)
-                    Toast.makeText(activity, "Added", Toast.LENGTH_LONG).show()
                 }
                 else{
                     bottomSheetDialog.hide()
-                    Toast.makeText(activity, "Not Added", Toast.LENGTH_LONG).show()
                 }
             }
 

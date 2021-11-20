@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -38,7 +39,7 @@ open class ChatRoomsAdapter(var context: Context): RecyclerView.Adapter<Recycler
     }
 
     protected class MyViewHolder(view: View): RecyclerView.ViewHolder(view){
-        var image: CircleImageView = view.findViewById<CircleImageView>(R.id.imgChatRoomIcon)
+        var image: ImageView = view.findViewById(R.id.imgChatImage)
         var title: TextView = view.findViewById(R.id.groupChatName)
         var message: TextView = view.findViewById(R.id.groupChatDescription)
         var join: RelativeLayout = view.findViewById(R.id.relJoin)

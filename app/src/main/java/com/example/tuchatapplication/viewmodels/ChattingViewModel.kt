@@ -2,6 +2,7 @@ package com.example.tuchatapplication.viewmodels
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,12 +11,17 @@ import com.example.tuchatapplication.models.Chat
 import com.example.tuchatapplication.models.Group
 import com.example.tuchatapplication.models.GroupDisplay
 import com.example.tuchatapplication.models.Member
+import com.example.tuchatapplication.reporitories.AuthRepository
 import com.example.tuchatapplication.reporitories.ChattingRepository
 import com.example.tuchatapplication.reporitories.GroupRepo
 import com.example.tuchatapplication.reporitories.MembersRepository
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ChattingViewModel(application: Application): AndroidViewModel(application) {
+    private val TAG = "ChattingViewModel"
     private var chattingRepository: ChattingRepository? = null
     private var createResponse: Long? = null
     private var memberResponse: Long? = null
@@ -91,33 +97,48 @@ class ChattingViewModel(application: Application): AndroidViewModel(application)
             str = membersRepo!!.getMemberGroups(userId)
             lst = groupRepo!!.generateGroups()
 
-            if (res.size > 0){
-                for (k in 0 until res.size){
-                    var chats = chattingRepository!!.getChats(res[k].group_id!!)
-                    var groupDisplay: GroupDisplay = GroupDisplay()
-                    groupDisplay.group_id = res[k].group_id
-                    groupDisplay.group_name = res[k].group_name
-                    groupDisplay.group_image = res[k].group_image
-                    groupDisplay.total = chats!!.size.toString()
-                    groupDisplay.message = chats!![chats!!.size - 1].message
-                    groupDisplay.date = chats!![chats!!.size - 1].date
-                    groupDisplay.time = chats[chats.size - 1].time
-
-                    chatsFinal!!.add(groupDisplay)
-                }
-            }
-        }
-
-        if (str!!.size > 0){
-            for (i in 0 until str!!.size){
-                for (j in 0 until lst!!.size){
-                    if (str!![i] == lst!![j].group_id){
-                        res.add(lst!![j])
+            if (str!!.size > 0){
+                for (i in 0 until str!!.size){
+                    for (j in 0 until lst!!.size){
+                        if (str!![i] == lst!![j].group_id){
+                            res.add(lst!![j])
+                        }
                     }
                 }
+
             }
 
-            memberGroups.value = chatsFinal
+            if (res.size > 0){
+                var groupDisplay: GroupDisplay = GroupDisplay()
+                for (k in 0 until res.size){
+                    var chats = chattingRepository!!.getChats(res[k].group_id!!)
+                    Log.i(TAG, "getMemberGroups: ${chats.size}")
+                    if (chats.size > 0){
+                        groupDisplay.group_id = res[k].group_id
+                        groupDisplay.group_name = res[k].group_name
+                        groupDisplay.group_image = res[k].group_image
+                        groupDisplay.total = chats!!.size.toString()
+                        groupDisplay.message = chats!![chats!!.size - 1].message
+                        groupDisplay.date = chats!![chats!!.size - 1].date
+                        groupDisplay.time = chats[chats.size - 1].time
+
+                        chatsFinal!!.add(groupDisplay)
+                    }
+                    else{
+                        groupDisplay.group_id = res[k].group_id
+                        groupDisplay.group_name = res[k].group_name
+                        groupDisplay.group_image = res[k].group_image
+                        groupDisplay.total = "0"
+                        groupDisplay.message = "No Message"
+                        groupDisplay.date = SimpleDateFormat("yyyy-MM-dd").format(Date())
+                        groupDisplay.time = SimpleDateFormat("hh:mm").format(Date())
+
+                        chatsFinal!!.add(groupDisplay)
+                    }
+
+                }
+                memberGroups.value = chatsFinal
+            }
         }
 
         return memberGroups

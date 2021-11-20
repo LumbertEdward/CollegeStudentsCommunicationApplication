@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
@@ -24,6 +25,7 @@ class Login : AppCompatActivity(), View.OnClickListener {
     private lateinit var btn: MaterialButton
     private lateinit var registerActivityViewModel: RegisterActivityViewModel
     private var sharedPreferences: SharedPreferences? = null
+    private lateinit var back: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,8 +39,10 @@ class Login : AppCompatActivity(), View.OnClickListener {
         email = findViewById(R.id.emailLogin)
         password = findViewById(R.id.passwordLogin)
         btn = findViewById(R.id.btnLogin)
+        back = findViewById(R.id.loginBack)
         btn.setOnClickListener(this)
         register.setOnClickListener(this)
+        back.setOnClickListener(this)
     }
 
     override fun onClick(p0: View?) {
@@ -48,6 +52,9 @@ class Login : AppCompatActivity(), View.OnClickListener {
             }
             R.id.btnLogin -> {
                 loginUser()
+            }
+            R.id.loginBack -> {
+                finish()
             }
         }
     }

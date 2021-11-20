@@ -3,7 +3,7 @@ package com.example.tuchatapplication.sqlitedatabase.database
 class Database {
     companion object{
         //database
-        const val DATABASE_NAME = "t"
-        const val DATABASE_VERSION = 1
+        const val DATABASE_NAME = "chatapplication.db"
+        const val DATABASE_VERSION = 5
     }
 }

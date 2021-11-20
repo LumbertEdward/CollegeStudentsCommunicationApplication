@@ -108,7 +108,6 @@ class MainActivity : AppCompatActivity(), Generalinterface {
     override fun addChatRoom(group: Group) {
         var sharedPreferences2 = getSharedPreferences("USER", Context.MODE_PRIVATE)
         var userPhone = sharedPreferences2.getString(getString(R.string.phone), "")
-
         mCallBack = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks(){
             override fun onVerificationCompleted(p0: PhoneAuthCredential) {
                 var code = p0.smsCode
@@ -144,7 +143,6 @@ class MainActivity : AppCompatActivity(), Generalinterface {
             .build()
 
         PhoneAuthProvider.verifyPhoneNumber(phoneAuthOptions)
-
     }
 
     override fun goToMainPage() {

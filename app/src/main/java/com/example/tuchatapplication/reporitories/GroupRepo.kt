@@ -2,17 +2,18 @@ package com.example.tuchatapplication.reporitories
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import com.example.tuchatapplication.models.Group
-import com.example.tuchatapplication.sqlitedatabase.helpers.GroupsSqliteDatabaseHelper
+import com.example.tuchatapplication.sqlitedatabase.helpers.UsersSqliteDatabaseHelper
 import com.example.tuchatapplication.sqlitedatabase.tables.GroupTable
 
 class GroupRepo(context: Context) {
     private val TAG = "GroupRepo"
-    private var groupsSqliteDatabaseHelper:GroupsSqliteDatabaseHelper? = null
+    private var usersSqliteDatabaseHelper: UsersSqliteDatabaseHelper? = null
 
     init {
-        groupsSqliteDatabaseHelper = GroupsSqliteDatabaseHelper(context)
+        usersSqliteDatabaseHelper = UsersSqliteDatabaseHelper(context)
     }
 
     companion object{
@@ -31,7 +32,7 @@ class GroupRepo(context: Context) {
     //create group
     suspend fun createGroup(group: Group): Long{
         if (group.group_id != null){
-            var db = groupsSqliteDatabaseHelper!!.writableDatabase
+            var db: SQLiteDatabase = usersSqliteDatabaseHelper!!.writableDatabase
             var contentValues: ContentValues = ContentValues().apply {
                 put(GroupTable.COLUMN_NAME_GROUP_ID, group.group_id)
                 put(GroupTable.COLUMN_NAME_GROUP_NAME, group.group_name)
@@ -58,7 +59,7 @@ class GroupRepo(context: Context) {
     }
 
     suspend fun generateGroups(): ArrayList<Group>{
-        var db = groupsSqliteDatabaseHelper!!.readableDatabase
+        var db: SQLiteDatabase = usersSqliteDatabaseHelper!!.readableDatabase
         var projection = arrayOf(
             GroupTable.COLUMN_NAME_ID, GroupTable.COLUMN_NAME_DATE_CREATED,
             GroupTable.COLUMN_NAME_CREATEDBY, GroupTable.COLUMN_NAME_IMAGE,
@@ -95,7 +96,7 @@ class GroupRepo(context: Context) {
     }
 
     suspend fun getGroupDetails(id: String): Group {
-        var db = groupsSqliteDatabaseHelper!!.readableDatabase
+        var db = usersSqliteDatabaseHelper!!.readableDatabase
         var projection = arrayOf(
             GroupTable.COLUMN_NAME_ID, GroupTable.COLUMN_NAME_DATE_CREATED,
             GroupTable.COLUMN_NAME_CREATEDBY, GroupTable.COLUMN_NAME_IMAGE,

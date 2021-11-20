@@ -1,26 +1,12 @@
 package com.example.tuchatapplication.viewmodels
 
-import android.app.Activity
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.tuchatapplication.apputils.AppUtils
 import com.example.tuchatapplication.models.User
 import com.example.tuchatapplication.reporitories.AuthRepository
 import com.example.tuchatapplication.reporitories.MembersRepository
-import com.example.tuchatapplication.sqlitedatabase.helpers.MembersSqliteDatabaseHelper
-import com.google.firebase.FirebaseException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthOptions
-import com.google.firebase.auth.PhoneAuthProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.concurrent.TimeUnit
 
 class RegisterActivityViewModel(application: Application): AndroidViewModel(application) {
     private var authRepository: AuthRepository? = null

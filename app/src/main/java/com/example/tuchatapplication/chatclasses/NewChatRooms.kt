@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -55,8 +56,10 @@ class NewChatRooms : Fragment(), View.OnClickListener {
         chattingViewModel.getGroups().observe(viewLifecycleOwner, Observer {
             Log.i(TAG, "onCreateView: ${it.size}")
             if (it.size > 0){
-
                 showRecycler(it)
+            }
+            else{
+
             }
         })
     }
@@ -65,14 +68,13 @@ class NewChatRooms : Fragment(), View.OnClickListener {
         var arr: ArrayList<Group> = ArrayList()
 
         for (i in it!!){
-            arr!!.add(i)
+            arr.add(i)
         }
 
         Log.i(TAG, "showRecycler: ${arr[0].group_id}")
         chatRoomsAdapter.getData(arr)
         recyclerView.adapter = chatRoomsAdapter
         recyclerView.layoutManager = linearLayoutManager
-        recyclerView.scrollToPosition(arr.size - 1)
     }
 
     override fun onClick(p0: View?) {

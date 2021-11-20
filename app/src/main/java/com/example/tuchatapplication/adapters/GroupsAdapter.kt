@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tuchatapplication.R
 import com.example.tuchatapplication.interfaces.Generalinterface
@@ -45,7 +42,7 @@ open class GroupsAdapter(var context: Context): RecyclerView.Adapter<RecyclerVie
     }
 
     protected class MyViewHolder(view: View): RecyclerView.ViewHolder(view) {
-        var image: CircleImageView = view.findViewById<CircleImageView>(R.id.imgGroupIcon)
+        var image: ImageView = view.findViewById(R.id.imgGroupImage)
         var title: TextView = view.findViewById(R.id.groupName)
         var message: TextView = view.findViewById(R.id.groupMessage)
         var time: TextView = view.findViewById(R.id.groupTime)

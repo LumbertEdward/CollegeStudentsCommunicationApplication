@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.example.tuchatapplication.MainActivity
@@ -35,6 +36,7 @@ class Register : AppCompatActivity(), View.OnClickListener {
     private lateinit var password: TextInputEditText
     private lateinit var phone: TextInputEditText
     private lateinit var btn: MaterialButton
+    private lateinit var back: ImageView
     private lateinit var registerActivityViewModel: RegisterActivityViewModel
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -54,6 +56,8 @@ class Register : AppCompatActivity(), View.OnClickListener {
         email = findViewById(R.id.email)
         password = findViewById(R.id.password)
         btn = findViewById(R.id.btnRegister)
+        back = findViewById(R.id.registerBack)
+        back.setOnClickListener(this)
         btn.setOnClickListener(this)
     }
 
@@ -61,6 +65,9 @@ class Register : AppCompatActivity(), View.OnClickListener {
         when(p0!!.id){
             R.id.btnRegister -> {
                 registerUser()
+            }
+            R.id.registerBack -> {
+                startActivity(Intent(this, Login::class.java))
             }
         }
     }

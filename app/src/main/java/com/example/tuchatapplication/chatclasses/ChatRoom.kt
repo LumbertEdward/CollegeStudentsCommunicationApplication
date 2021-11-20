@@ -40,6 +40,7 @@ class ChatRoom : Fragment(), View.OnClickListener {
     private lateinit var send: ImageView
     private lateinit var attach: ImageView
     private lateinit var recyclerView: RecyclerView
+    private lateinit var desc: TextView
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var chatAdapter: ChatAdapter
     private lateinit var back: RelativeLayout
@@ -53,7 +54,7 @@ class ChatRoom : Fragment(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        chattingViewModel = ViewModelProvider(this).get(ChattingViewModel::class.java)
+
     }
 
     override fun onCreateView(
@@ -66,12 +67,15 @@ class ChatRoom : Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        chattingViewModel = ViewModelProvider(requireActivity()).get(ChattingViewModel::class.java)
+
         recyclerView = view.findViewById(R.id.recyclerChats)
         chat = view.findViewById(R.id.editChat)
         attach = view.findViewById(R.id.attach)
         send = view.findViewById(R.id.send)
         back = view.findViewById(R.id.relBackChats)
         title = view.findViewById(R.id.txtTitleChat)
+        desc = view.findViewById(R.id.txtDesc)
 
         linearLayoutManager = LinearLayoutManager(activity)
         chatAdapter = ChatAdapter(activity as Context)
@@ -122,6 +126,7 @@ class ChatRoom : Fragment(), View.OnClickListener {
         chattingViewModel.getGroupDetails(groupId!!).observe(viewLifecycleOwner, Observer {
             if (it != null){
                 title.text = it.group_name
+                desc.text = it.group_description
             }
         })
     }
@@ -129,17 +134,24 @@ class ChatRoom : Fragment(), View.OnClickListener {
     private fun getChats() {
         chattingViewModel.getGroupChats(groupId!!).observe(viewLifecycleOwner, Observer {
             if (it.isNotEmpty()){
-                for (i in it){
-                    chatList.add(i)
-                }
+                setChats(it)
             }
         })
+    }
+
+    private fun setChats(it: List<Chat>?) {
+        for (i in it!!){
+            chatList.add(i)
+        }
 
         if (chatList.size > 0){
             chatAdapter.getData(chatList)
             recyclerView.adapter = chatAdapter
             recyclerView.layoutManager = linearLayoutManager
             recyclerView.scrollToPosition(chatList.size - 1)
+        }
+        else{
+            Toast.makeText(activity, "Not Found", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -162,8 +174,9 @@ class ChatRoom : Fragment(), View.OnClickListener {
     }
 
     private fun sendChat() {
+        Log.i(TAG, "sendChat: Sending")
         var date = SimpleDateFormat("yyyy-MM-dd").format(Date())
-        var chatId: String = Random.nextInt(100, 1000).toString()
+        var chatId: String = Random.nextInt(10, 1000).toString()
         var time = SimpleDateFormat("hh:mm").format(Date())
         var message = chat.text.toString().trim()
 
@@ -179,6 +192,11 @@ class ChatRoom : Fragment(), View.OnClickListener {
             var response = chattingViewModel.addChat(nChat)
             if (response >= 0){
                 Log.i(TAG, "sendChat: Added")
+                chatList.add(nChat)
+                if (chatList.size > 0){
+                    chatAdapter.addNewData(nChat, chatList.size - 1)
+                    recyclerView.scrollToPosition(chatList.size - 1)
+                }
             }
             else{
                 Log.i(TAG, "sendChat: Not Added")

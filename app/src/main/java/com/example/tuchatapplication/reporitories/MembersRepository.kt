@@ -2,17 +2,18 @@ package com.example.tuchatapplication.reporitories
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import com.example.tuchatapplication.models.Member
-import com.example.tuchatapplication.sqlitedatabase.helpers.MembersSqliteDatabaseHelper
+import com.example.tuchatapplication.sqlitedatabase.helpers.UsersSqliteDatabaseHelper
 import com.example.tuchatapplication.sqlitedatabase.tables.MembersTable
 
 class MembersRepository(context: Context) {
     private val TAG = "MembersRepository"
-    private var membersSqliteDatabaseHelper: MembersSqliteDatabaseHelper? = null
+    private var usersSqliteDatabaseHelper: UsersSqliteDatabaseHelper? = null
 
     init {
-        membersSqliteDatabaseHelper = MembersSqliteDatabaseHelper(context)
+        usersSqliteDatabaseHelper = UsersSqliteDatabaseHelper(context)
     }
 
     companion object{
@@ -30,7 +31,7 @@ class MembersRepository(context: Context) {
     //MEMBERS
     //add member
     suspend fun addMember(member: Member): Long{
-        var db = membersSqliteDatabaseHelper!!.writableDatabase
+        var db: SQLiteDatabase = usersSqliteDatabaseHelper!!.writableDatabase
         var contentValues: ContentValues = ContentValues().apply {
             put(MembersTable.COLUMN_NAME_USERID, member.userId)
             put(MembersTable.COLUMN_NAME_GROUPID, member.groupId)
@@ -52,7 +53,7 @@ class MembersRepository(context: Context) {
     }
 
     suspend fun getMembersByGroup(groupId: String): ArrayList<Member>{
-        var db = membersSqliteDatabaseHelper!!.readableDatabase
+        var db = usersSqliteDatabaseHelper!!.readableDatabase
         var projection =  arrayOf(
             MembersTable.COLUMN_NAME_ID, MembersTable.COLUMN_NAME_DATE_ADDED, MembersTable.COLUMN_NAME_USERID,
             MembersTable.COLUMN_NAME_GROUPID, MembersTable.COLUMN_NAME_CODE)
@@ -85,7 +86,7 @@ class MembersRepository(context: Context) {
     }
 
     suspend fun getMemberGroups(userId: String): ArrayList<String>{
-        var db = membersSqliteDatabaseHelper!!.readableDatabase
+        var db = usersSqliteDatabaseHelper!!.readableDatabase
         var projection =  arrayOf(
             MembersTable.COLUMN_NAME_ID, MembersTable.COLUMN_NAME_DATE_ADDED, MembersTable.COLUMN_NAME_USERID,
             MembersTable.COLUMN_NAME_GROUPID, MembersTable.COLUMN_NAME_CODE)

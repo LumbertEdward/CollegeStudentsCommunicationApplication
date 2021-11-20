@@ -6,8 +6,15 @@ import android.app.Application
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.util.Log
+import com.example.tuchatapplication.models.Chat
+import com.example.tuchatapplication.models.Group
+import com.example.tuchatapplication.models.Member
 import com.example.tuchatapplication.models.User
 import com.example.tuchatapplication.sqlitedatabase.helpers.UsersSqliteDatabaseHelper
+import com.example.tuchatapplication.sqlitedatabase.tables.ChatsTable
+import com.example.tuchatapplication.sqlitedatabase.tables.GroupTable
+import com.example.tuchatapplication.sqlitedatabase.tables.MembersTable
 import com.example.tuchatapplication.sqlitedatabase.tables.UserTable
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
@@ -143,7 +150,4 @@ class AuthRepository(context: Context) {
 
         return us
     }
-
-
-
 }
