@@ -1,0 +1,114 @@
+package com.example.tuchatapplication.reporitories
+
+import android.content.ContentValues
+import android.content.Context
+import android.util.Log
+import com.example.tuchatapplication.models.Member
+import com.example.tuchatapplication.sqlitedatabase.helpers.MembersSqliteDatabaseHelper
+import com.example.tuchatapplication.sqlitedatabase.tables.MembersTable
+
+class MembersRepository(context: Context) {
+    private val TAG = "MembersRepository"
+    private var membersSqliteDatabaseHelper: MembersSqliteDatabaseHelper? = null
+
+    init {
+        membersSqliteDatabaseHelper = MembersSqliteDatabaseHelper(context)
+    }
+
+    companion object{
+        private var INSTANCE: MembersRepository? = null
+
+        fun setInstance(context: Context): MembersRepository{
+            if (INSTANCE == null){
+                INSTANCE = MembersRepository(context)
+            }
+
+            return INSTANCE!!
+        }
+    }
+
+    //MEMBERS
+    //add member
+    suspend fun addMember(member: Member): Long{
+        var db = membersSqliteDatabaseHelper!!.writableDatabase
+        var contentValues: ContentValues = ContentValues().apply {
+            put(MembersTable.COLUMN_NAME_USERID, member.userId)
+            put(MembersTable.COLUMN_NAME_GROUPID, member.groupId)
+            put(MembersTable.COLUMN_NAME_CODE, member.code)
+            put(MembersTable.COLUMN_NAME_DATE_ADDED, member.dateAdded)
+        }
+
+        var response = db.insert(MembersTable.TABLE_NAME, null, contentValues)
+
+        Log.i(TAG, "addMember: ${response}")
+
+        if (response >= 0){
+            return response
+        }
+        else{
+            return -1
+        }
+
+    }
+
+    suspend fun getMembersByGroup(groupId: String): ArrayList<Member>{
+        var db = membersSqliteDatabaseHelper!!.readableDatabase
+        var projection =  arrayOf(
+            MembersTable.COLUMN_NAME_ID, MembersTable.COLUMN_NAME_DATE_ADDED, MembersTable.COLUMN_NAME_USERID,
+            MembersTable.COLUMN_NAME_GROUPID, MembersTable.COLUMN_NAME_CODE)
+        var selection = "${MembersTable.COLUMN_NAME_GROUPID} = ?"
+        var selectionArgs = arrayOf(groupId)
+
+        var cursor = db.query(
+            MembersTable.TABLE_NAME,
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
+        )
+
+        var lst: ArrayList<Member> = ArrayList()
+
+        while (cursor.moveToNext()){
+            var member: Member = Member()
+            member.userId = cursor.getString(cursor.getColumnIndexOrThrow(MembersTable.COLUMN_NAME_USERID))
+            member.groupId = cursor.getString(cursor.getColumnIndexOrThrow(MembersTable.COLUMN_NAME_GROUPID))
+            member.code = cursor.getString(cursor.getColumnIndexOrThrow(MembersTable.COLUMN_NAME_CODE))
+            member.dateAdded = cursor.getString(cursor.getColumnIndexOrThrow(MembersTable.COLUMN_NAME_DATE_ADDED))
+
+            lst.add(member)
+        }
+
+        return lst
+    }
+
+    suspend fun getMemberGroups(userId: String): ArrayList<String>{
+        var db = membersSqliteDatabaseHelper!!.readableDatabase
+        var projection =  arrayOf(
+            MembersTable.COLUMN_NAME_ID, MembersTable.COLUMN_NAME_DATE_ADDED, MembersTable.COLUMN_NAME_USERID,
+            MembersTable.COLUMN_NAME_GROUPID, MembersTable.COLUMN_NAME_CODE)
+        var selection = "${MembersTable.COLUMN_NAME_USERID} = ?"
+        var selectionArgs = arrayOf(userId)
+
+        var cursor = db.query(
+            MembersTable.TABLE_NAME,
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
+        )
+
+        var lst: ArrayList<String> = ArrayList()
+
+        while (cursor.moveToNext()){
+            lst.add(cursor.getString(cursor.getColumnIndexOrThrow(MembersTable.COLUMN_NAME_GROUPID)))
+        }
+
+        return lst
+    }
+
+}

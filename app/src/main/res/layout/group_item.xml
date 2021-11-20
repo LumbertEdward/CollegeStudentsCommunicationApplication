@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:id="@+id/groupId"
+    android:padding="15dp"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imgGroupIcon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/logo"
+            android:scaleType="fitXY"
+            android:layout_gravity="center_vertical"
+            />
+
+        <LinearLayout
+            android:layout_width="260dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="13dp"
+            >
+            <TextView
+                android:id="@+id/groupName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="University of Nairobi"
+                android:textColor="@color/black"
+                android:fontFamily="@font/robotomedium"
+                android:maxLines="1"
+                android:ellipsize="end"
+                />
+            <TextView
+                android:id="@+id/groupMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hey we have a class in the next few minutes"
+                android:fontFamily="@font/robotoregular"
+                android:layout_marginTop="2dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentEnd="true"
+        >
+        <TextView
+            android:id="@+id/groupTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="7:30 PM"
+            android:layout_gravity="center_horizontal"
+            android:textSize="10sp"
+            android:fontFamily="@font/robotomedium"
+            />
+
+        <RelativeLayout
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:background="@drawable/total_back"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            >
+            <TextView
+                android:id="@+id/groupTotal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/white"
+                android:fontFamily="@font/robotomedium"
+                android:textSize="10sp"
+                />
+
+        </RelativeLayout>
+    </LinearLayout>
+
+</RelativeLayout>
