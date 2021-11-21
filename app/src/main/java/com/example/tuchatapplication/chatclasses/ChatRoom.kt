@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.*
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -28,6 +29,7 @@ import com.example.tuchatapplication.adapters.ChatAdapter
 import com.example.tuchatapplication.interfaces.Generalinterface
 import com.example.tuchatapplication.models.Chat
 import com.example.tuchatapplication.viewmodels.ChattingViewModel
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -39,6 +41,7 @@ class ChatRoom : Fragment(), View.OnClickListener {
     private lateinit var chat: EditText
     private lateinit var send: ImageView
     private lateinit var attach: ImageView
+    private lateinit var bot: RelativeLayout
     private lateinit var recyclerView: RecyclerView
     private lateinit var desc: TextView
     private lateinit var linearLayoutManager: LinearLayoutManager
@@ -76,6 +79,7 @@ class ChatRoom : Fragment(), View.OnClickListener {
         back = view.findViewById(R.id.relBackChats)
         title = view.findViewById(R.id.txtTitleChat)
         desc = view.findViewById(R.id.txtDesc)
+        bot = view.findViewById(R.id.relBot)
 
         linearLayoutManager = LinearLayoutManager(activity)
         chatAdapter = ChatAdapter(activity as Context)
@@ -83,6 +87,7 @@ class ChatRoom : Fragment(), View.OnClickListener {
         attach.setOnClickListener(this)
         send.setOnClickListener(this)
         back.setOnClickListener(this)
+        bot.setOnClickListener(this)
 
         recyclerView.adapter = chatAdapter
         recyclerView.layoutManager = linearLayoutManager
@@ -165,6 +170,9 @@ class ChatRoom : Fragment(), View.OnClickListener {
             R.id.relBackChats -> {
                 generalinterface.goToMainPage()
             }
+            R.id.relBot -> {
+                showBottomSheet()
+            }
         }
 
     }
@@ -199,6 +207,34 @@ class ChatRoom : Fragment(), View.OnClickListener {
             }
         }
 
+    }
+
+    private fun showBottomSheet() {
+        var context = activity as Context
+        var bottomSheetDialog: BottomSheetDialog = BottomSheetDialog(context, R.style.SheetDialog)
+        bottomSheetDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        bottomSheetDialog.setContentView(R.layout.leave_sheet)
+
+        var join = bottomSheetDialog.findViewById<LinearLayout>(R.id.linLeave)
+        bottomSheetDialog.show()
+
+        join!!.setOnClickListener {
+            leaveGroup()
+            bottomSheetDialog.hide()
+        }
+    }
+
+    private fun leaveGroup() {
+        if (userId != null){
+            var res = chattingViewModel.leaveGroup(userId!!, groupId!!)
+
+            if (res > 0){
+                generalinterface.goToMainPage()
+            }
+            else{
+                Log.i(TAG, "leaveGroup: Left")
+            }
+        }
     }
 
     override fun onAttach(context: Context) {

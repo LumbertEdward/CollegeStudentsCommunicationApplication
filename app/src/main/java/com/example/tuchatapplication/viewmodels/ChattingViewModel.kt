@@ -158,6 +158,15 @@ class ChattingViewModel(application: Application): AndroidViewModel(application)
         return memberGroups
     }
 
+    fun leaveGroup(userId: String, groupId: String): Int{
+        var res: Int? = null
+        viewModelScope.launch {
+            res = membersRepo!!.leaveGroup(userId, groupId)
+        }
+
+        return res!!
+    }
+
     //add chat
     fun addChat(chat: Chat): Long{
         viewModelScope.launch {

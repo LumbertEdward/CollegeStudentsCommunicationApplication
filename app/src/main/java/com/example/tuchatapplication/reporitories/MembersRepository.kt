@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import com.example.tuchatapplication.models.Member
 import com.example.tuchatapplication.sqlitedatabase.helpers.UsersSqliteDatabaseHelper
+import com.example.tuchatapplication.sqlitedatabase.queries.MembersQueries
 import com.example.tuchatapplication.sqlitedatabase.tables.MembersTable
 
 class MembersRepository(context: Context) {
@@ -110,6 +111,21 @@ class MembersRepository(context: Context) {
         }
 
         return lst
+    }
+
+    suspend fun leaveGroup(userId: String, groupId: String): Int{
+        var db = usersSqliteDatabaseHelper!!.writableDatabase
+        var selection = "${MembersTable.COLUMN_NAME_USERID} = ? AND ${MembersTable.COLUMN_NAME_GROUPID} = ?"
+        var selectionArgs = arrayOf(userId, groupId)
+        var res = db.delete(MembersTable.TABLE_NAME,
+            selection,
+            selectionArgs
+        )
+
+        if (res >= 0){
+            return res
+        }
+        return 0
     }
 
 }
