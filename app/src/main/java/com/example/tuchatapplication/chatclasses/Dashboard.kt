@@ -2,8 +2,13 @@ package com.example.tuchatapplication.chatclasses
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.media.MediaCodec.MetricsConstants.MODE
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,7 +18,12 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,6 +38,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
+import de.hdodenhof.circleimageview.CircleImageView
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -46,6 +58,8 @@ class Dashboard : Fragment(), View.OnClickListener {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var groupsAdapter: GroupsAdapter
     private var userId: String? = null
+    private var filePath: Uri? = null
+    private lateinit var pic: CircleImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -128,6 +142,25 @@ class Dashboard : Fragment(), View.OnClickListener {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
+    var chatPic = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), ActivityResultCallback {
+        if (it.resultCode == AppCompatActivity.RESULT_OK && it.data != null){
+            filePath = it.data!!.data!!
+            try {
+                val source = ImageDecoder.createSource(requireActivity().contentResolver,
+                    filePath!!
+                )
+                val bitmap: Bitmap = ImageDecoder.decodeBitmap(source)
+                pic.setImageBitmap(bitmap)
+
+
+            }
+            catch (e: IOException){
+                e.printStackTrace()
+            }
+        }
+    })
+
     @SuppressLint("SimpleDateFormat")
     private fun showChatRoomAdditionSheet() {
         var context = activity as Context
@@ -139,8 +172,17 @@ class Dashboard : Fragment(), View.OnClickListener {
         var desc: TextInputEditText = bottomSheetDialog.findViewById<TextInputEditText>(R.id.chatDescription)!!
         var cap: TextInputEditText = bottomSheetDialog.findViewById<TextInputEditText>(R.id.chatCapacity)!!
         var btnChart: MaterialButton = bottomSheetDialog.findViewById<MaterialButton>(R.id.btnChat)!!
+        var picClick: TextView = bottomSheetDialog.findViewById<TextView>(R.id.chatPic)!!
+        pic = bottomSheetDialog.findViewById<CircleImageView>(R.id.imgRoomPic)!!
 
         bottomSheetDialog.show()
+
+        picClick.setOnClickListener {
+            val intent: Intent = Intent()
+            intent.type = "image/*"
+            intent.action = Intent.ACTION_GET_CONTENT
+            chatPic.launch(intent)
+        }
 
         btnChart.setOnClickListener {
             var time = SimpleDateFormat("yyyy-MM-dd").format(Date())
