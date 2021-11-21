@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.tuchatapplication.R
 import com.example.tuchatapplication.interfaces.Generalinterface
 import com.example.tuchatapplication.models.Group
+import com.squareup.picasso.OkHttp3Downloader
+import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 
 open class ChatRoomsAdapter(var context: Context): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -24,6 +26,12 @@ open class ChatRoomsAdapter(var context: Context): RecyclerView.Adapter<Recycler
         var myViewHolder: MyViewHolder = holder as MyViewHolder
         myViewHolder.title.text = groupList!![position].group_name
         myViewHolder.message.text = groupList!![position].group_description
+        if (groupList[position].group_image != ""){
+            var picasso: Picasso.Builder = Picasso.Builder(context)
+            picasso.downloader(OkHttp3Downloader(context))
+            picasso.build().load(groupList[position].group_image).into(myViewHolder.image)
+        }
+
         myViewHolder.join.setOnClickListener {
             generalinterface.addChatRoom(groupList!![position])
         }

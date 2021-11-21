@@ -52,7 +52,8 @@
                         android:id="@+id/imgRoomPic"
                         android:layout_width="60dp"
                         android:layout_height="60dp"
-                        android:src="@drawable/person2"
+                        android:src="@drawable/logo"
+                        android:scaleType="fitXY"
                         android:layout_centerHorizontal="true"
                         />
 

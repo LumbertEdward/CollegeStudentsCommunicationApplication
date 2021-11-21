@@ -38,6 +38,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import de.hdodenhof.circleimageview.CircleImageView
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -59,7 +61,10 @@ class Dashboard : Fragment(), View.OnClickListener {
     private lateinit var groupsAdapter: GroupsAdapter
     private var userId: String? = null
     private var filePath: Uri? = null
+    private var imgUrl: String = ""
     private lateinit var pic: CircleImageView
+    private lateinit var firebaseStorage: FirebaseStorage
+    private lateinit var storageReference: StorageReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,6 +82,7 @@ class Dashboard : Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         chattingViewModel = ViewModelProvider(requireActivity()).get(ChattingViewModel::class.java)
+        firebaseStorage = FirebaseStorage.getInstance()
 
         var context = activity as Context
 
@@ -152,14 +158,26 @@ class Dashboard : Fragment(), View.OnClickListener {
                 )
                 val bitmap: Bitmap = ImageDecoder.decodeBitmap(source)
                 pic.setImageBitmap(bitmap)
-
-
+                if (bitmap != null){
+                    sendToDb()
+                }
             }
             catch (e: IOException){
                 e.printStackTrace()
             }
         }
     })
+
+    private fun sendToDb() {
+        if (!filePath!!.equals(null)){
+            storageReference = firebaseStorage.getReference("images/" + UUID.randomUUID().toString())
+            storageReference.putFile(filePath!!).addOnSuccessListener {
+                it.storage.downloadUrl.addOnCompleteListener {
+                    imgUrl = it.result.toString()
+                }
+            }
+        }
+    }
 
     @SuppressLint("SimpleDateFormat")
     private fun showChatRoomAdditionSheet() {
@@ -192,7 +210,7 @@ class Dashboard : Fragment(), View.OnClickListener {
             group.group_description = desc.text.toString().trim()
             group.group_capacity = cap.text.toString().toInt()
             group.group_created_by = userId
-            group.group_image = ""
+            group.group_image = imgUrl
             group.group_date_created = time
             group.group_id = "${name.text.toString().trim()}${Random.nextInt(100, 10000).toString()}"
 
