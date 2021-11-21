@@ -84,6 +84,9 @@ class ChatRoom : Fragment(), View.OnClickListener {
         send.setOnClickListener(this)
         back.setOnClickListener(this)
 
+        recyclerView.adapter = chatAdapter
+        recyclerView.layoutManager = linearLayoutManager
+
         getGroupDetails()
 
         getChats()
@@ -145,8 +148,6 @@ class ChatRoom : Fragment(), View.OnClickListener {
         }
 
         chatAdapter.getData(chatList)
-        recyclerView.adapter = chatAdapter
-        recyclerView.layoutManager = linearLayoutManager
         recyclerView.scrollToPosition(chatList.size - 1)
     }
 
