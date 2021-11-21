@@ -16,10 +16,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -62,7 +59,7 @@ class Dashboard : Fragment(), View.OnClickListener {
     private var userId: String? = null
     private var filePath: Uri? = null
     private var imgUrl: String = ""
-    private lateinit var pic: CircleImageView
+    private lateinit var pic: ImageView
     private lateinit var firebaseStorage: FirebaseStorage
     private lateinit var storageReference: StorageReference
 
@@ -191,7 +188,7 @@ class Dashboard : Fragment(), View.OnClickListener {
         var cap: TextInputEditText = bottomSheetDialog.findViewById<TextInputEditText>(R.id.chatCapacity)!!
         var btnChart: MaterialButton = bottomSheetDialog.findViewById<MaterialButton>(R.id.btnChat)!!
         var picClick: TextView = bottomSheetDialog.findViewById<TextView>(R.id.chatPic)!!
-        pic = bottomSheetDialog.findViewById<CircleImageView>(R.id.imgRoomPic)!!
+        pic = bottomSheetDialog.findViewById<ImageView>(R.id.imgChatRoomPic)!!
 
         bottomSheetDialog.show()
 
