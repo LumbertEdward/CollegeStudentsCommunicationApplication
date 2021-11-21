@@ -144,15 +144,10 @@ class ChatRoom : Fragment(), View.OnClickListener {
             chatList.add(i)
         }
 
-        if (chatList.size > 0){
-            chatAdapter.getData(chatList)
-            recyclerView.adapter = chatAdapter
-            recyclerView.layoutManager = linearLayoutManager
-            recyclerView.scrollToPosition(chatList.size - 1)
-        }
-        else{
-            Toast.makeText(activity, "Not Found", Toast.LENGTH_LONG).show()
-        }
+        chatAdapter.getData(chatList)
+        recyclerView.adapter = chatAdapter
+        recyclerView.layoutManager = linearLayoutManager
+        recyclerView.scrollToPosition(chatList.size - 1)
     }
 
     override fun onClick(p0: View?) {

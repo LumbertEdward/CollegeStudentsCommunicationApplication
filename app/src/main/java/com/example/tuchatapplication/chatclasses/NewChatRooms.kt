@@ -1,6 +1,7 @@
 package com.example.tuchatapplication.chatclasses
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -28,6 +29,8 @@ class NewChatRooms : Fragment(), View.OnClickListener {
     private lateinit var back: RelativeLayout
     private lateinit var search: RelativeLayout
     private lateinit var generalinterface: Generalinterface
+    private lateinit var sharedPreferences: SharedPreferences
+    private var userId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +56,11 @@ class NewChatRooms : Fragment(), View.OnClickListener {
         back.setOnClickListener(this)
         search.setOnClickListener(this)
 
-        chattingViewModel.getGroups().observe(viewLifecycleOwner, Observer {
+        //Sharedprefences
+        sharedPreferences = activity?.getSharedPreferences(getString(R.string.User), Context.MODE_PRIVATE)!!
+        userId = sharedPreferences.getString(getString(R.string.id), "")
+
+        chattingViewModel.getGroups(userId!!).observe(viewLifecycleOwner, Observer {
             Log.i(TAG, "onCreateView: ${it.size}")
             if (it.size > 0){
                 showRecycler(it)

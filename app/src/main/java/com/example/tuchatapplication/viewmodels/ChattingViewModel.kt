@@ -51,12 +51,26 @@ class ChattingViewModel(application: Application): AndroidViewModel(application)
     }
 
     //generate groups
-    fun getGroups(): MutableLiveData<List<Group>>{
+    fun getGroups(userId: String): MutableLiveData<List<Group>>{
+        var str: ArrayList<String>? = null
+        var lst: ArrayList<Group>? = null
+        var res: ArrayList<Group> = ArrayList()
         viewModelScope.launch {
-            groups.value = groupRepo!!.generateGroups()
+            str = membersRepo!!.getMemberGroups(userId)
+            lst = groupRepo!!.generateGroups()
+
+            for (i in 0 until lst!!.size - 1){
+                for (j in 0 until str!!.size - 1){
+                    if (lst!![i].group_id != str!![j]){
+                        res.add(lst!![i])
+                    }
+                }
+            }
+
+            groups.value = res
         }
 
-        return groups!!
+        return groups
     }
 
     //group details
