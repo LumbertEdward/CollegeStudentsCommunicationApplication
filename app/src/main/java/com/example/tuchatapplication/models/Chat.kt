@@ -6,6 +6,7 @@ class Chat(
     var groupId: String? = null,
     var message: String? = null,
     var date: String? = null,
-    var time: String? = null
+    var time: String? = null,
+    var img: String? = null
 ) {
 }

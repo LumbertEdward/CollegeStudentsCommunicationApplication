@@ -11,7 +11,8 @@ class ChatEntries {
                 "${ChatsTable.COLUMN_NAME_GROUPID} TEXT," +
                 "${ChatsTable.COLUMN_NAME_MESSAGE} TEXT," +
                 "${ChatsTable.COLUMN_NAME_TIME} TEXT," +
-                "${ChatsTable.COLUMN_NAME_USERID} TEXT)"
+                "${ChatsTable.COLUMN_NAME_USERID} TEXT," +
+                "${ChatsTable.COLUMN_NAME_IMAGE} TEXT)"
 
         var CHAT_SQL_DROP = "DROP TABLE IF EXISTS ${ChatsTable.TABLE_NAME}"
     }

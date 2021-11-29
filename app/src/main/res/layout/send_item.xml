@@ -27,6 +27,14 @@
                 android:textColor="@color/lightblue"
                 android:textSize="12sp"
                 />
+            <ImageView
+                android:id="@+id/imgChatMessage"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/person2"
+                android:scaleType="fitXY"
+                android:layout_marginTop="5dp"
+                />
             <TextView
                 android:id="@+id/chatContent"
                 android:layout_width="wrap_content"
@@ -35,11 +43,6 @@
                 android:textColor="@color/white"
                 android:fontFamily="@font/robotomedium"
                 android:layout_marginTop="5dp"
-                />
-            <ImageView
-                android:id="@+id/imgChatMessage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 />
         </LinearLayout>
         <RelativeLayout

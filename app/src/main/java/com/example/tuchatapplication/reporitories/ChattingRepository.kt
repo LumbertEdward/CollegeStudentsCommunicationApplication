@@ -39,6 +39,7 @@ class ChattingRepository(context: Context) {
             put(ChatsTable.COLUMN_NAME_MESSAGE, chat.message)
             put(ChatsTable.COLUMN_NAME_DATE, chat.date)
             put(ChatsTable.COLUMN_NAME_TIME, chat.time)
+            put(ChatsTable.COLUMN_NAME_IMAGE, chat.img)
         }
 
         var response = db.insert(ChatsTable.TABLE_NAME, null, contentValues)
@@ -53,7 +54,7 @@ class ChattingRepository(context: Context) {
     suspend fun getChats(groupId: String): ArrayList<Chat>{
         var db = usersSqliteDatabaseHelper!!.readableDatabase
         var projection = arrayOf(ChatsTable.COLUMN_NAME_CHAT_ID, ChatsTable.COLUMN_NAME_USERID, ChatsTable.COLUMN_NAME_TIME,
-        ChatsTable.COLUMN_NAME_MESSAGE, ChatsTable.COLUMN_NAME_GROUPID, ChatsTable.COLUMN_NAME_DATE, ChatsTable.COLUMN_NAME_ID)
+        ChatsTable.COLUMN_NAME_MESSAGE, ChatsTable.COLUMN_NAME_GROUPID, ChatsTable.COLUMN_NAME_IMAGE, ChatsTable.COLUMN_NAME_DATE, ChatsTable.COLUMN_NAME_ID)
         var selection = "${ChatsTable.COLUMN_NAME_GROUPID} = ?"
         var selectionArgs = arrayOf(groupId)
 
@@ -75,6 +76,7 @@ class ChattingRepository(context: Context) {
             chat.message = cursor.getString(cursor.getColumnIndexOrThrow(ChatsTable.COLUMN_NAME_MESSAGE))
             chat.time = cursor.getString(cursor.getColumnIndexOrThrow(ChatsTable.COLUMN_NAME_TIME))
             chat.userId = cursor.getString(cursor.getColumnIndexOrThrow(ChatsTable.COLUMN_NAME_USERID))
+            chat.img = cursor.getString(cursor.getColumnIndexOrThrow(ChatsTable.COLUMN_NAME_IMAGE))
 
             lst.add(chat)
         }

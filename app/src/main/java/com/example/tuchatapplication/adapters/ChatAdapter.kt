@@ -10,8 +10,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tuchatapplication.R
 import com.example.tuchatapplication.models.Chat
+import com.squareup.picasso.OkHttp3Downloader
+import com.squareup.picasso.Picasso
 
-open class ChatAdapter(context: Context): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+open class ChatAdapter(var context: Context): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var lst: ArrayList<Chat> = ArrayList()
     var sharedPreferences = context.getSharedPreferences(context.getString(R.string.User), MODE_PRIVATE)
     var userId = sharedPreferences!!.getString(context.getString(R.string.id), "")
@@ -33,12 +35,26 @@ open class ChatAdapter(context: Context): RecyclerView.Adapter<RecyclerView.View
             sendViewModel.name.text = chat.userId.toString()
             sendViewModel.content.text = chat.message
             sendViewModel.time.text = chat.time
+            sendViewModel.img.visibility = View.GONE
+            if (chat.img != ""){
+                sendViewModel.img.visibility = View.VISIBLE
+                var picasso: Picasso.Builder = Picasso.Builder(context)
+                picasso.downloader(OkHttp3Downloader(context))
+                picasso.build().load(chat.img).into(sendViewModel.img)
+            }
         }
         else{
             var receiveViewModel: ReceiveViewModel = holder as ReceiveViewModel
             receiveViewModel.recName.text = chat.userId.toString()
             receiveViewModel.recContent.text = chat.message
             receiveViewModel.recTime.text = chat.time
+            receiveViewModel.img.visibility = View.GONE
+            if (chat.img != ""){
+                receiveViewModel.img.visibility = View.VISIBLE
+                var picasso: Picasso.Builder = Picasso.Builder(context)
+                picasso.downloader(OkHttp3Downloader(context))
+                picasso.build().load(chat.img).into(receiveViewModel.img)
+            }
         }
     }
 

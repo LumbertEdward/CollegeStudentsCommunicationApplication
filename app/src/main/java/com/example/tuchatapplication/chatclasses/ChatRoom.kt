@@ -26,10 +26,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tuchatapplication.R
 import com.example.tuchatapplication.adapters.ChatAdapter
+import com.example.tuchatapplication.apputils.AppUtils
 import com.example.tuchatapplication.interfaces.Generalinterface
 import com.example.tuchatapplication.models.Chat
 import com.example.tuchatapplication.viewmodels.ChattingViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -48,12 +51,17 @@ class ChatRoom : Fragment(), View.OnClickListener {
     private lateinit var chatAdapter: ChatAdapter
     private lateinit var back: RelativeLayout
     private lateinit var title: TextView
+    private lateinit var imgChat: ImageView
     private lateinit var chattingViewModel: ChattingViewModel
     private var groupId: String? = null
     private var userId: String? = null
     private var chatList: ArrayList<Chat> = ArrayList()
     private lateinit var generalinterface: Generalinterface
     private var filePath: Uri? = null
+    private lateinit var firebaseStorage: FirebaseStorage
+    private lateinit var storageReference: StorageReference
+    private var imgUrl: String? = null
+    private lateinit var appUtils: AppUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,6 +79,8 @@ class ChatRoom : Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         chattingViewModel = ViewModelProvider(requireActivity()).get(ChattingViewModel::class.java)
+        firebaseStorage = FirebaseStorage.getInstance()
+        appUtils = AppUtils(requireContext())
 
         recyclerView = view.findViewById(R.id.recyclerChats)
         chat = view.findViewById(R.id.editChat)
@@ -80,6 +90,8 @@ class ChatRoom : Fragment(), View.OnClickListener {
         title = view.findViewById(R.id.txtTitleChat)
         desc = view.findViewById(R.id.txtDesc)
         bot = view.findViewById(R.id.relBot)
+        imgChat = view.findViewById(R.id.imgChat)
+        imgChat.visibility = View.GONE
 
         linearLayoutManager = LinearLayoutManager(activity)
         chatAdapter = ChatAdapter(activity as Context)
@@ -108,6 +120,12 @@ class ChatRoom : Fragment(), View.OnClickListener {
                     filePath!!
                 )
                 val bitmap: Bitmap = ImageDecoder.decodeBitmap(source)
+                if (bitmap != null){
+                    imgChat.visibility= View.VISIBLE
+                    imgChat.setImageBitmap(bitmap)
+
+                    sendToDb()
+                }
 
             }
             catch (e: IOException){
@@ -115,6 +133,24 @@ class ChatRoom : Fragment(), View.OnClickListener {
             }
         }
     })
+
+    private fun sendToDb() {
+        if (!filePath!!.equals(null)){
+            Log.i(TAG, "sendToDb: " + "Sent" + filePath)
+            storageReference = firebaseStorage.reference.child("images/" + UUID.randomUUID().toString())
+            storageReference.putFile(filePath!!).addOnSuccessListener {
+                it.storage.downloadUrl.addOnCompleteListener {
+                    imgUrl = it.result.toString()
+                    if (imgUrl != ""){
+                        send.isEnabled = true
+                    }
+                }
+            }
+        }
+        else{
+            Toast.makeText(activity, "Not sent", Toast.LENGTH_LONG).show()
+        }
+    }
 
     private fun getUserId() {
         var sharedPrefs: SharedPreferences = activity?.getSharedPreferences(getString(R.string.User),
@@ -159,10 +195,17 @@ class ChatRoom : Fragment(), View.OnClickListener {
     override fun onClick(p0: View?) {
         when(p0!!.id){
             R.id.attach -> {
-                val intent: Intent = Intent()
-                intent.type = "image/*"
-                intent.action = Intent.ACTION_GET_CONTENT
-                chatPic.launch(intent)
+                if (appUtils.checkWiFi()){
+                    send.isEnabled = false
+                    val intent: Intent = Intent()
+                    intent.type = "image/*"
+                    intent.action = Intent.ACTION_GET_CONTENT
+                    chatPic.launch(intent)
+                }
+                else{
+                    Toast.makeText(activity, "Connect to the internet", Toast.LENGTH_LONG).show()
+                }
+
             }
             R.id.send -> {
                 sendChat()
@@ -192,6 +235,7 @@ class ChatRoom : Fragment(), View.OnClickListener {
             nChat.date = date
             nChat.message = message
             nChat.chatId = chatId
+            nChat.img = imgUrl ?: ""
 
             var response = chattingViewModel.addChat(nChat)
             if (response >= 0){

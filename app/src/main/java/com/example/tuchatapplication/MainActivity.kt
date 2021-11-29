@@ -13,6 +13,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.example.tuchatapplication.apputils.AppUtils
 import com.example.tuchatapplication.auth.Login
 import com.example.tuchatapplication.chatclasses.ChatRoom
+import com.example.tuchatapplication.chatclasses.Dashboard
 import com.example.tuchatapplication.interfaces.Generalinterface
 import com.example.tuchatapplication.models.Group
 import com.example.tuchatapplication.models.Member
@@ -173,6 +174,9 @@ class MainActivity : AppCompatActivity(), Generalinterface {
         navHostFragment.childFragmentManager.primaryNavigationFragment?.let {
             if (it is ChatRoom){
                 navController.navigate(R.id.dashboard)
+            }
+            if (it is Dashboard){
+                logOut()
             }
             else{
                 super.onBackPressed()

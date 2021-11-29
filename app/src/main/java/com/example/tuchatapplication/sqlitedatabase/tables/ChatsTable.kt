@@ -10,5 +10,6 @@ class ChatsTable {
         const val COLUMN_NAME_TIME = "time"
         const val COLUMN_NAME_DATE = "date"
         const val COLUMN_NAME_GROUPID = "groupid"
+        const val COLUMN_NAME_IMAGE = "image"
     }
 }

@@ -25,6 +25,14 @@
                 android:textColor="@android:color/darker_gray"
                 android:textSize="12sp"
                 />
+            <ImageView
+                android:id="@+id/imgReceiveMessage"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/person2"
+                android:scaleType="fitXY"
+                android:layout_marginTop="5dp"
+                />
             <TextView
                 android:id="@+id/recContent"
                 android:layout_width="wrap_content"
@@ -33,11 +41,6 @@
                 android:textColor="@color/primary"
                 android:fontFamily="@font/robotomedium"
                 android:layout_marginTop="5dp"
-                />
-            <ImageView
-                android:id="@+id/imgReceiveMessage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 />
         </LinearLayout>
         <RelativeLayout
