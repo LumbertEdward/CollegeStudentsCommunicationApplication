@@ -74,6 +74,17 @@
             tools:listitem="@layout/new_chat_item"
             />
 
+        <TextView
+            android:id="@+id/txtAvailable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No Available ChatRoom"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:fontFamily="@font/robotobold"
+            android:textSize="20sp"
+            />
+
     </RelativeLayout>
 
 </LinearLayout>

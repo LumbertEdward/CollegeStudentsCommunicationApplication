@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -29,6 +30,7 @@ class NewChatRooms : Fragment(), View.OnClickListener {
     private lateinit var chattingViewModel: ChattingViewModel
     private lateinit var back: RelativeLayout
     private lateinit var search: RelativeLayout
+    private lateinit var txtAva: TextView
     private lateinit var generalinterface: Generalinterface
     private lateinit var sharedPreferences: SharedPreferences
     private var newLst: ArrayList<Group>? = null
@@ -52,8 +54,10 @@ class NewChatRooms : Fragment(), View.OnClickListener {
         recyclerView = view.findViewById(R.id.recyclerNewChatRoom)
         back = view.findViewById(R.id.relBackNewChat)
         search = view.findViewById(R.id.relSearch)
+        txtAva = view.findViewById(R.id.txtAvailable)
         linearLayoutManager = LinearLayoutManager(activity)
         chatRoomsAdapter = ChatRoomsAdapter(activity as Context)
+        txtAva.visibility = View.VISIBLE
 
         back.setOnClickListener(this)
         search.setOnClickListener(this)
@@ -82,6 +86,7 @@ class NewChatRooms : Fragment(), View.OnClickListener {
         newLst = arr
 
         if (newLst!!.size > 0){
+            txtAva.visibility = View.GONE
             chatRoomsAdapter.getData(newLst!!)
             recyclerView.adapter = chatRoomsAdapter
             recyclerView.layoutManager = linearLayoutManager
