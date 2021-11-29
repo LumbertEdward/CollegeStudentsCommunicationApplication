@@ -16,6 +16,7 @@ import com.example.tuchatapplication.reporitories.ChattingRepository
 import com.example.tuchatapplication.reporitories.GroupRepo
 import com.example.tuchatapplication.reporitories.MembersRepository
 import kotlinx.coroutines.launch
+import java.sql.Array
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -54,20 +55,29 @@ class ChattingViewModel(application: Application): AndroidViewModel(application)
     fun getGroups(userId: String): MutableLiveData<List<Group>>{
         var str: ArrayList<String>? = null
         var lst: ArrayList<Group>? = null
-        var res: ArrayList<Group> = ArrayList()
+        var res: ArrayList<Group>? = null
         viewModelScope.launch {
             str = membersRepo!!.getMemberGroups(userId)
             lst = groupRepo!!.generateGroups()
-
-            for (i in 0 until lst!!.size - 1){
-                for (j in 0 until str!!.size - 1){
-                    if (lst!![i].group_id != str!![j]){
-                        res.add(lst!![i])
+            
+            if (lst!!.size > 0){
+                var grpLst: ArrayList<Group> = ArrayList()
+                for (i in 0 until lst!!.size){
+                    for (j in 0 until str!!.size){
+                        if (str!![j] != lst!![i].group_id){
+                            Log.i(TAG, "getGroups: ${lst!![i].group_name}")
+                            grpLst.add(lst!![i])
+                        }
+                        else{
+                            Log.i(TAG, "getGroups Not equal: ${lst!![i].group_name}")
+                        }
                     }
                 }
-            }
 
-            groups.value = res
+                res = grpLst
+            }
+            
+            groups.value = lst
         }
 
         return groups
@@ -105,51 +115,55 @@ class ChattingViewModel(application: Application): AndroidViewModel(application)
         var lst: ArrayList<Group>? = null
         var str: ArrayList<String>? = null
         var res: ArrayList<Group> = ArrayList()
-        var chatsFinal: ArrayList<GroupDisplay>? = ArrayList()
+        var chatsFinal: ArrayList<GroupDisplay>? = null
 
         viewModelScope.launch {
             str = membersRepo!!.getMemberGroups(userId)
             lst = groupRepo!!.generateGroups()
 
             if (str!!.size > 0){
-                for (i in 0 until str!!.size){
-                    for (j in 0 until lst!!.size){
+                for (j in 0 until lst!!.size){
+                    for (i in 0 until str!!.size){
                         if (str!![i] == lst!![j].group_id){
                             res.add(lst!![j])
                         }
                     }
                 }
 
-            }
+                if (res.size > 0){
+                    var chatLst: ArrayList<GroupDisplay> = ArrayList()
+                    var tot = res.size
+                    for (k in 0 until tot){
+                        var chats = chattingRepository!!.getChats(res[k].group_id!!)
+                        if (chats.size > 0){
+                            var groupDisplay: GroupDisplay = GroupDisplay()
+                            groupDisplay.group_id = res[k].group_id
+                            groupDisplay.group_name = res[k].group_name
+                            groupDisplay.group_image = res[k].group_image
+                            groupDisplay.total = chats!!.size.toString()
+                            groupDisplay.message = chats!![chats!!.size - 1].message
+                            groupDisplay.date = chats!![chats!!.size - 1].date
+                            groupDisplay.time = chats[chats.size - 1].time
 
-            if (res.size > 0){
-                var groupDisplay: GroupDisplay = GroupDisplay()
-                for (k in 0 until res.size){
-                    var chats = chattingRepository!!.getChats(res[k].group_id!!)
-                    Log.i(TAG, "getMemberGroups: ${chats.size}")
-                    if (chats.size > 0){
-                        groupDisplay.group_id = res[k].group_id
-                        groupDisplay.group_name = res[k].group_name
-                        groupDisplay.group_image = res[k].group_image
-                        groupDisplay.total = chats!!.size.toString()
-                        groupDisplay.message = chats!![chats!!.size - 1].message
-                        groupDisplay.date = chats!![chats!!.size - 1].date
-                        groupDisplay.time = chats[chats.size - 1].time
+                            chatLst.add(groupDisplay)
 
-                        chatsFinal!!.add(groupDisplay)
+                        }
+                        else{
+                            var groupDisplay: GroupDisplay = GroupDisplay()
+                            groupDisplay.group_id = res[k].group_id
+                            groupDisplay.group_name = res[k].group_name
+                            groupDisplay.group_image = res[k].group_image
+                            groupDisplay.total = "0"
+                            groupDisplay.message = "No Message"
+                            groupDisplay.date = SimpleDateFormat("yyyy-MM-dd").format(Date())
+                            groupDisplay.time = SimpleDateFormat("hh:mm").format(Date())
+
+                            chatLst.add(groupDisplay)
+                        }
+
                     }
-                    else{
-                        groupDisplay.group_id = res[k].group_id
-                        groupDisplay.group_name = res[k].group_name
-                        groupDisplay.group_image = res[k].group_image
-                        groupDisplay.total = "0"
-                        groupDisplay.message = "No Message"
-                        groupDisplay.date = SimpleDateFormat("yyyy-MM-dd").format(Date())
-                        groupDisplay.time = SimpleDateFormat("hh:mm").format(Date())
 
-                        chatsFinal!!.add(groupDisplay)
-                    }
-
+                    chatsFinal = chatLst
                 }
                 memberGroups.value = chatsFinal
             }

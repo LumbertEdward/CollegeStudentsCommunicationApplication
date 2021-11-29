@@ -10,7 +10,9 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import com.example.tuchatapplication.apputils.AppUtils
 import com.example.tuchatapplication.auth.Login
+import com.example.tuchatapplication.chatclasses.ChatRoom
 import com.example.tuchatapplication.interfaces.Generalinterface
 import com.example.tuchatapplication.models.Group
 import com.example.tuchatapplication.models.Member
@@ -32,6 +34,7 @@ class MainActivity : AppCompatActivity(), Generalinterface {
     private lateinit var mCallBack: PhoneAuthProvider.OnVerificationStateChangedCallbacks
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var chattingViewModel: ChattingViewModel
+    private lateinit var appUtils: AppUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +44,7 @@ class MainActivity : AppCompatActivity(), Generalinterface {
         navController = navHostFragment.navController
         chattingViewModel = ViewModelProvider(this).get(ChattingViewModel::class.java)
         firebaseAuth = FirebaseAuth.getInstance()
+        appUtils = AppUtils(this)
         initFrag()
     }
 
@@ -106,43 +110,50 @@ class MainActivity : AppCompatActivity(), Generalinterface {
     }
 
     override fun addChatRoom(group: Group) {
-        var sharedPreferences2 = getSharedPreferences("USER", Context.MODE_PRIVATE)
-        var userPhone = sharedPreferences2.getString(getString(R.string.phone), "")
-        mCallBack = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks(){
-            override fun onVerificationCompleted(p0: PhoneAuthCredential) {
-                var code = p0.smsCode
+        if (appUtils.checkWiFi()){
+            var sharedPreferences2 = getSharedPreferences("USER", Context.MODE_PRIVATE)
+            var userPhone = sharedPreferences2.getString(getString(R.string.phone), "")
 
-                if (code != null){
-                    var newSharedPreferences: SharedPreferences = getSharedPreferences("CODE", MODE_PRIVATE)
-                    var editor2: SharedPreferences.Editor = newSharedPreferences.edit()
-                    editor2.putString("NUMBER", code)
-                    editor2.putString("GroupId", group.group_id)
-                    editor2.apply()
+            mCallBack = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks(){
+                override fun onVerificationCompleted(p0: PhoneAuthCredential) {
+                    var code = p0.smsCode
 
-                    navController.navigate(R.id.verification)
+                    if (code != null){
+                        var newSharedPreferences: SharedPreferences = getSharedPreferences("CODE", MODE_PRIVATE)
+                        var editor2: SharedPreferences.Editor = newSharedPreferences.edit()
+                        editor2.putString("NUMBER", code)
+                        editor2.putString("GroupId", group.group_id)
+                        editor2.apply()
+
+                        navController.navigate(R.id.verification)
+                    }
+
                 }
 
+                override fun onVerificationFailed(p0: FirebaseException) {
+                    Log.i(TAG, "onVerificationFailed: $p0")
+
+                }
+
+                override fun onCodeSent(p0: String, p1: PhoneAuthProvider.ForceResendingToken) {
+                    Log.i(TAG, "onCodeSent: $p0")
+
+                }
             }
 
-            override fun onVerificationFailed(p0: FirebaseException) {
-                Log.i(TAG, "onVerificationFailed: $p0")
+            val phoneAuthOptions: PhoneAuthOptions = PhoneAuthOptions.newBuilder(firebaseAuth)
+                .setPhoneNumber("+254$userPhone")
+                .setTimeout(60L, TimeUnit.SECONDS)
+                .setActivity(this)
+                .setCallbacks(mCallBack)
+                .build()
 
-            }
-
-            override fun onCodeSent(p0: String, p1: PhoneAuthProvider.ForceResendingToken) {
-                Log.i(TAG, "onCodeSent: $p0")
-
-            }
+            PhoneAuthProvider.verifyPhoneNumber(phoneAuthOptions)
+        }
+        else{
+            Toast.makeText(this, "Connect to the internet for code generation", Toast.LENGTH_LONG).show()
         }
 
-        val phoneAuthOptions: PhoneAuthOptions = PhoneAuthOptions.newBuilder(firebaseAuth)
-            .setPhoneNumber("+254$userPhone")
-            .setTimeout(60L, TimeUnit.SECONDS)
-            .setActivity(this)
-            .setCallbacks(mCallBack)
-            .build()
-
-        PhoneAuthProvider.verifyPhoneNumber(phoneAuthOptions)
     }
 
     override fun goToMainPage() {
@@ -158,5 +169,14 @@ class MainActivity : AppCompatActivity(), Generalinterface {
         navController.navigate(R.id.chatRoom)
     }
 
-
+    override fun onBackPressed() {
+        navHostFragment.childFragmentManager.primaryNavigationFragment?.let {
+            if (it is ChatRoom){
+                navController.navigate(R.id.dashboard)
+            }
+            else{
+                super.onBackPressed()
+            }
+        }
+    }
 }

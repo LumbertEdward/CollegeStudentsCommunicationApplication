@@ -17,6 +17,8 @@ android {
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        resValue "string", "app_email", (project.findProperty("EMAIL") ?: "")
+        resValue "string", "app_password", (project.findProperty("PASSWORD") ?: "")
     }
 
     buildTypes {

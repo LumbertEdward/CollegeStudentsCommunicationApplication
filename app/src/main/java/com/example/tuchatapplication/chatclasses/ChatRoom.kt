@@ -237,8 +237,12 @@ class ChatRoom : Fragment(), View.OnClickListener {
         }
     }
 
+
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         generalinterface = context as Generalinterface
     }
+
+
 }

@@ -136,7 +136,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="20dp"
-            android:hint="Phone Number (ignore +254)"
+            android:hint="Valid Phone Number (ignore +254)"
             app:boxStrokeColor="@color/black"
             app:boxStrokeWidth="0.5dp"
             app:hintTextColor="@android:color/darker_gray"

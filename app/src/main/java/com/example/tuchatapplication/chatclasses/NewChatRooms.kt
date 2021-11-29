@@ -18,6 +18,7 @@ import com.example.tuchatapplication.R
 import com.example.tuchatapplication.adapters.ChatRoomsAdapter
 import com.example.tuchatapplication.interfaces.Generalinterface
 import com.example.tuchatapplication.models.Group
+import com.example.tuchatapplication.models.GroupDisplay
 import com.example.tuchatapplication.viewmodels.ChattingViewModel
 
 class NewChatRooms : Fragment(), View.OnClickListener {
@@ -30,6 +31,7 @@ class NewChatRooms : Fragment(), View.OnClickListener {
     private lateinit var search: RelativeLayout
     private lateinit var generalinterface: Generalinterface
     private lateinit var sharedPreferences: SharedPreferences
+    private var newLst: ArrayList<Group>? = null
     private var userId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +63,6 @@ class NewChatRooms : Fragment(), View.OnClickListener {
         userId = sharedPreferences.getString(getString(R.string.id), "")
 
         chattingViewModel.getGroups(userId!!).observe(viewLifecycleOwner, Observer {
-            Log.i(TAG, "onCreateView: ${it.size}")
             if (it.size > 0){
                 showRecycler(it)
             }
@@ -78,10 +79,13 @@ class NewChatRooms : Fragment(), View.OnClickListener {
             arr.add(i)
         }
 
-        Log.i(TAG, "showRecycler: ${arr[0].group_id}")
-        chatRoomsAdapter.getData(arr)
-        recyclerView.adapter = chatRoomsAdapter
-        recyclerView.layoutManager = linearLayoutManager
+        newLst = arr
+
+        if (newLst!!.size > 0){
+            chatRoomsAdapter.getData(newLst!!)
+            recyclerView.adapter = chatRoomsAdapter
+            recyclerView.layoutManager = linearLayoutManager
+        }
     }
 
     override fun onClick(p0: View?) {

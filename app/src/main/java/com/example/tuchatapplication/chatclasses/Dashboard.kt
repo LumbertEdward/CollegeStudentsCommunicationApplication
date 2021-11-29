@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tuchatapplication.R
 import com.example.tuchatapplication.adapters.GroupsAdapter
+import com.example.tuchatapplication.apputils.AppUtils
 import com.example.tuchatapplication.interfaces.Generalinterface
 import com.example.tuchatapplication.models.Group
 import com.example.tuchatapplication.models.GroupDisplay
@@ -48,11 +49,14 @@ class Dashboard : Fragment(), View.OnClickListener {
     private val TAG = "Dashboard"
     private lateinit var more: RelativeLayout
     private lateinit var floatingActionButton: FloatingActionButton
+    private lateinit var homeTxt: TextView
     private lateinit var profile: RelativeLayout
     private lateinit var generalinterface: Generalinterface
     private lateinit var recyclerView: RecyclerView
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var chattingViewModel: ChattingViewModel
+    private lateinit var btnChart: MaterialButton
+    private lateinit var progress: ProgressBar
     private var groups: ArrayList<GroupDisplay> = ArrayList()
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var groupsAdapter: GroupsAdapter
@@ -62,6 +66,7 @@ class Dashboard : Fragment(), View.OnClickListener {
     private lateinit var pic: ImageView
     private lateinit var firebaseStorage: FirebaseStorage
     private lateinit var storageReference: StorageReference
+    private lateinit var appUtils: AppUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,6 +85,7 @@ class Dashboard : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         chattingViewModel = ViewModelProvider(requireActivity()).get(ChattingViewModel::class.java)
         firebaseStorage = FirebaseStorage.getInstance()
+        appUtils = AppUtils(requireContext())
 
         var context = activity as Context
 
@@ -88,13 +94,16 @@ class Dashboard : Fragment(), View.OnClickListener {
         floatingActionButton = view.findViewById(R.id.floatDashboard)
         profile = view.findViewById(R.id.relProfile)
         recyclerView = view.findViewById(R.id.recyclerGroups)
+        homeTxt = view.findViewById(R.id.txtHome)
+        homeTxt.visibility = View.VISIBLE
+        recyclerView.visibility = View.GONE
 
         //clicks
         profile.setOnClickListener(this)
         floatingActionButton.setOnClickListener(this)
         more.setOnClickListener(this)
 
-        //Sharedprefences
+        //Sharedpreferences
         sharedPreferences = activity?.getSharedPreferences(getString(R.string.User), Context.MODE_PRIVATE)!!
         userId = sharedPreferences.getString(getString(R.string.id), "")
 
@@ -109,7 +118,7 @@ class Dashboard : Fragment(), View.OnClickListener {
     private fun getListData() {
         chattingViewModel.getMemberGroups(userId!!).observe(viewLifecycleOwner, Observer {
             if (it.isNotEmpty()){
-
+                groups.clear()
                 showRecycler(it)
             }
             else{
@@ -124,6 +133,8 @@ class Dashboard : Fragment(), View.OnClickListener {
         }
 
         if (groups.size > 0){
+            homeTxt.visibility = View.GONE
+            recyclerView.visibility = View.VISIBLE
             groupsAdapter.getData(groups)
             recyclerView.adapter = groupsAdapter
             recyclerView.layoutManager = linearLayoutManager
@@ -167,12 +178,20 @@ class Dashboard : Fragment(), View.OnClickListener {
 
     private fun sendToDb() {
         if (!filePath!!.equals(null)){
-            storageReference = firebaseStorage.getReference("images/" + UUID.randomUUID().toString())
+            Log.i(TAG, "sendToDb: " + "Sent" + filePath)
+            storageReference = firebaseStorage.reference.child("images/" + UUID.randomUUID().toString())
             storageReference.putFile(filePath!!).addOnSuccessListener {
                 it.storage.downloadUrl.addOnCompleteListener {
                     imgUrl = it.result.toString()
+                    if (imgUrl != ""){
+                        btnChart.isEnabled = true
+                        progress.visibility = View.GONE
+                    }
                 }
             }
+        }
+        else{
+            Toast.makeText(activity, "Not sent", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -186,13 +205,17 @@ class Dashboard : Fragment(), View.OnClickListener {
         var name: TextInputEditText = bottomSheetDialog.findViewById<TextInputEditText>(R.id.chatName)!!
         var desc: TextInputEditText = bottomSheetDialog.findViewById<TextInputEditText>(R.id.chatDescription)!!
         var cap: TextInputEditText = bottomSheetDialog.findViewById<TextInputEditText>(R.id.chatCapacity)!!
-        var btnChart: MaterialButton = bottomSheetDialog.findViewById<MaterialButton>(R.id.btnChat)!!
+        btnChart = bottomSheetDialog.findViewById<MaterialButton>(R.id.btnChat)!!
+        progress = bottomSheetDialog.findViewById<ProgressBar>(R.id.progressNew)!!
         var picClick: TextView = bottomSheetDialog.findViewById<TextView>(R.id.chatPic)!!
         pic = bottomSheetDialog.findViewById<ImageView>(R.id.imgChatRoomPic)!!
 
+        progress.visibility = View.GONE
         bottomSheetDialog.show()
 
         picClick.setOnClickListener {
+            btnChart.isEnabled = false
+            progress.visibility = View.VISIBLE
             val intent: Intent = Intent()
             intent.type = "image/*"
             intent.action = Intent.ACTION_GET_CONTENT
@@ -200,31 +223,36 @@ class Dashboard : Fragment(), View.OnClickListener {
         }
 
         btnChart.setOnClickListener {
-            var time = SimpleDateFormat("yyyy-MM-dd").format(Date())
+            if (appUtils.checkWiFi()){
+                var time = SimpleDateFormat("yyyy-MM-dd").format(Date())
 
-            var group: Group = Group()
-            group.group_name = name.text.toString().trim()
-            group.group_description = desc.text.toString().trim()
-            group.group_capacity = cap.text.toString().toInt()
-            group.group_created_by = userId
-            group.group_image = imgUrl
-            group.group_date_created = time
-            group.group_id = "${name.text.toString().trim()}${Random.nextInt(100, 10000).toString()}"
+                var group: Group = Group()
+                group.group_name = name.text.toString().trim()
+                group.group_description = desc.text.toString().trim()
+                group.group_capacity = cap.text.toString().toInt()
+                group.group_created_by = userId
+                group.group_image = imgUrl
+                group.group_date_created = time
+                group.group_id = "${userId.toString()}${Random.nextInt(100, 10000).toString()}"
 
-            if (group != null){
-                var resp = chattingViewModel.createGroup(group)
+                if (group != null){
+                    var resp = chattingViewModel.createGroup(group)
 
-                Log.i(TAG, "showChatRoomAdditionSheet: ${resp}")
+                    Log.i(TAG, "showChatRoomAdditionSheet: ${resp}")
 
-                if (resp >= 0){
-                    bottomSheetDialog.hide()
-                    generalinterface.addChatRoom(group)
-                }
-                else{
-                    bottomSheetDialog.hide()
+                    if (resp >= 0){
+                        Toast.makeText(activity, "Group Created Successfully, wait for joining code", Toast.LENGTH_LONG).show()
+                        generalinterface.addChatRoom(group)
+                        bottomSheetDialog.hide()
+                    }
+                    else{
+                        Toast.makeText(activity, "Group Not Created, try again", Toast.LENGTH_LONG).show()
+                    }
                 }
             }
-
+            else{
+                Toast.makeText(activity, "Connect to the internet for code generation", Toast.LENGTH_LONG).show()
+            }
         }
     }
 

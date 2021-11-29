@@ -26,7 +26,7 @@ open class GroupsAdapter(var context: Context): RecyclerView.Adapter<RecyclerVie
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         var myViewHolder: MyViewHolder = holder as MyViewHolder
         myViewHolder.title.text = lst!![position].group_name
-        myViewHolder.message.text = lst[position].message
+        myViewHolder.message.text = lst[position].message ?: ""
         myViewHolder.time.text = lst[position].time
         myViewHolder.total.text = lst[position].total
         if (lst[position].group_image != ""){
